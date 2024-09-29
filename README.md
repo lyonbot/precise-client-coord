@@ -1,5 +1,7 @@
 # precise-client-coord
 
+[ [npm](https://www.npmjs.com/package/precise-client-coord) | [github](https://github.com/lyonbot/precise-client-coord) | [demo](https://lyonbot.github.io/precise-client-coord/) ]
+
 Get clientX and clientY in double type, not integer.
 
 <p align="center">
