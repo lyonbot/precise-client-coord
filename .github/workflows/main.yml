@@ -27,9 +27,12 @@ jobs:
           npm install -g pnpm@8.11.0
           pnpm install
           pnpm run build
+          rm -rf node_modules .gitignore
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v1
+        with:
+          path: .
 
   # Deploy job
   deploy:
@@ -42,5 +45,5 @@ jobs:
       pages: write
       id-token: write
     steps:
-      - uses: actions/deploy-pages@v1
+      - uses: actions/deploy-pages@v2
         id: deployment
