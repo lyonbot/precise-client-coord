@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="lorem">
+      Lorem ipsum, dolor sit amet consectetur adipisicing elit. Voluptas facilis modi nulla voluptatem neque quo velit,
+      impedit id placeat totam. Obcaecati ad velit dolore vitae quidem necessitatibus, nesciunt hic distinctio.
+    </div>
+    <main>
+      <div id="estimatedResult">Zoom page, and move mouse</div>
+      <div id="originalResult">-</div>
+
+      <svg id="lineSvg" width="100%" height="100%">
+        <path d="" fill="none" stroke="#f00" stroke-width="0.1" id="lineFixed" />
+        <path d="" fill="none" stroke="#00f8" stroke-width="0.1" id="lineOrigninal" />
+      </svg>
+    </main>
+
+    <script type="module">
+      import { estimateCoord, resetCoordEstimator } from "./dist/index.mjs";
+
+      window.addEventListener("resize", resetCoordEstimator);
+      window.addEventListener("mousemove", (e) => {
+        const originalClientX = e.clientX;
+        const originalClientY = e.clientY;
+        const { clientX, clientY } = estimateCoord(e);
+
+        display(clientX, clientY, originalClientX, originalClientY);
+      });
+
+      // ----------------------------------------------
+
+      const $estimatedResult = document.getElementById("estimatedResult");
+      const $originalResult = document.getElementById("originalResult");
+
+      function display(clientX, clientY, originalClientX, originalClientY) {
+        $estimatedResult.textContent = `(${clientX.toFixed(2)}, ${clientY.toFixed(2)})`;
+        $originalResult.textContent = `(${originalClientX}, ${originalClientY})`;
+
+        fixedXy.push(`${clientX},${clientY}`);
+        originalXy.push(`${originalClientX},${originalClientY}`);
+
+        updateLine();
+      }
+
+      let fixedXy = [];
+      let originalXy = [];
+      const lineFixed = document.getElementById("lineFixed");
+      const lineOrigninal = document.getElementById("lineOrigninal");
+      function updateLine() {
+        if (fixedXy.length > 100) fixedXy.shift();
+        if (originalXy.length > 100) originalXy.shift();
+        lineFixed.setAttribute("d", `M${fixedXy.join("L")}`);
+        lineOrigninal.setAttribute("d", `M${originalXy.join("L")}`);
+      }
+
+      // add iframe to test
+      if (!location.search.includes("no-iframe")) {
+        const iframe = document.createElement("iframe");
+        iframe.src = location.pathname + "?no-iframe";
+        document.querySelector("main").appendChild(iframe);
+      } else {
+        const msg = document.createElement("div");
+        msg.textContent = "I'm a test iframe";
+        document.querySelector("main").append(msg);
+        document.body.className += " in-iframe";
+      }
+
+      // add lorem ipsum background
+
+      const lorem = document.getElementById("lorem");
+      const loremParts = lorem.textContent
+        .split(" ")
+        .map((x) => x.trim())
+        .filter(Boolean);
+      lorem.textContent = Array.from(
+        { length: 700 },
+        () => loremParts[Math.floor(Math.random() * loremParts.length)]
+      ).join(" ");
+    </script>
+
+    <style>
+      body {
+        background: #fff;
+      }
+
+      body.in-iframe {
+        background: #333;
+        color: #eee;
+      }
+
+      main {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      main iframe {
+        margin-top: 32px;
+        width: 40vw;
+        min-width: 400px;
+        height: 30vh;
+        border: 1px solid #999;
+        box-shadow: 0 0 4px #999;
+        border-radius: 4px;
+      }
+
+      #originalResult {
+        font-size: 0.7em;
+        opacity: 0.7;
+      }
+      #originalResult::before {
+        content: "original: ";
+        opacity: 0.5;
+      }
+
+      #lineSvg {
+        position: fixed;
+        pointer-events: none;
+        inset: 0;
+      }
+
+      #output {
+        font-size: 24px;
+      }
+
+      #lorem {
+        opacity: 0.04;
+        font-size: 4vw;
+        width: 200vw;
+        font-family: serif;
+      }
+    </style>
+  </body>
+</html>
