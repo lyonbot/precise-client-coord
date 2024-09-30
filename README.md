@@ -21,4 +21,10 @@ window.addEventListener("mousemove", (e) => {
 
   display(clientX, clientY, originalClientX, originalClientY);
 });
+
+// for mobile and touch devices
+if (window.visualViewport) {
+  window.visualViewport.addEventListener("resize", resetCoordEstimator);
+  window.visualViewport.addEventListener("scroll", resetCoordEstimator);
+}
 ```
